@@ -1,3 +1,4 @@
+from typing import Union
 from dataclasses import dataclass
 
 
@@ -1221,22 +1222,15 @@ class UserAgentEngine:
 	"""
 	A class that holds the different engine specific user agent parts.
 
-<<<<<<<< HEAD:PyWebRequests/user_agents/data.py
-    Attributes:
-        apple_webkit_versions (list[range]): A list of ranges of numbers for AppleWebKit versions.
-        gecko_versions (list[typing.Union[range, list[range]]]): A list of ranges of numbers for Gecko versions.
-    """
-========
 	Attributes:
-		apple_webkit_versions (list[range]): A list of ranges of numbers for AppleWebKit versions.
-		gecko_versions (list[Union[range, list[range]]]): A list of ranges of numbers for Gecko versions.
+		apple_webkit_versions (list[list[int]]): A list of ranges of numbers for AppleWebKit versions.
+		gecko_versions (list[Union[list[int], list[list[int]]]]): A list of ranges of numbers for Gecko versions.
 	"""
->>>>>>>> dev:osn_requests/user_agents/data.py
-	apple_webkit_versions = [range(500, 615), range(0, 50), range(1, 50)]
+	apple_webkit_versions = [list(range(500, 615)), list(range(0, 50)), list(range(1, 50))]
 	gecko_versions = [
-		range(2015, 2024),
-		range(1, 12),
-		[range(1, 31), range(1, 30), range(1, 29), range(1, 28)]
+		list(range(2015, 2024)),
+		list(range(1, 12)),
+		[list(range(1, 31)), list(range(1, 30)), list(range(1, 29)), list(range(1, 28))]
 	]
 
 
@@ -1245,52 +1239,22 @@ class UserAgentBrowser:
 	"""
 	A class that holds the different browser specific user agent parts.
 
-<<<<<<<< HEAD:PyWebRequests/user_agents/data.py
-    Attributes:
-        chrome_versions (list[list[typing.Union[int, range]]]): A list of supported Chrome versions.
-        firefox_versions (list[list[typing.Union[int, range]]]): A list of supported Firefox versions.
-        safari_versions (list[typing.Union[int, range]]): A list of supported Safari versions.
-        opera_versions (list[list[typing.Union[int, range]]]): A list of supported Opera versions.
-        edge_versions (list[list[typing.Union[int, range]]]): A list of supported Edge versions.
-        yandex_versions (list[list[typing.Union[int, range]]]): A list of supported Yandex versions.
-    """
-	chrome_versions = [
-		[i, 0, range(2200 + 50 * (i - 40), 2250 + 50 * (i - 40)), range(0, 225)]
-		for i in range(40, 133)
-========
 	Attributes:
-		chrome_versions (list[list[Union[int, range]]]): A list of supported Chrome versions.
-		firefox_versions (list[list[Union[int, range]]]): A list of supported Firefox versions.
-		safari_versions (list[Union[int, range]]): A list of supported Safari versions.
-		opera_versions (list[list[Union[int, range]]]): A list of supported Opera versions.
-		edge_versions (list[list[Union[int, range]]]): A list of supported Edge versions.
-		yandex_versions (list[list[Union[int, range]]]): A list of supported Yandex versions.
+		chrome_versions (list[Union[int, list[int]]]): A list of supported Chrome versions.
+		firefox_versions (list[Union[int, list[int]]]): A list of supported Firefox versions.
+		safari_versions (list[Union[int, list[int]]]): A list of supported Safari versions.
+		opera_versions (list[Union[int, list[int]]]): A list of supported Opera versions.
+		edge_versions (list[Union[int, list[int]]]): A list of supported Edge versions.
+		yandex_versions (list[Union[int, list[int]]]): A list of supported Yandex versions.
 	"""
-	chrome_versions = [
-		[i, 0, range(2200 + 50 * (i - 40), 2250 + 50 * (i - 40)), range(0, 225)] for i in range(40, 133)
->>>>>>>> dev:osn_requests/user_agents/data.py
-	]
+	chrome_versions = [list(range(40, 133)), 0, [0] + list(range(3000, 6000)), list(range(0, 225))]
 	
-	firefox_versions = [[i, 0, range(0, 3)] for i in range(35, 135)]
+	firefox_versions = [list(range(35, 136)), 0, list(range(0, 3))]
 	
-	safari_versions = [range(500, 715), range(0, 50), range(1, 50)]
+	safari_versions = [list(range(500, 715)), list(range(0, 50)), list(range(1, 50))]
 	
-	opera_versions = [
-<<<<<<<< HEAD:PyWebRequests/user_agents/data.py
-		[i, 0, range(1200 + 50 * (i - 14), 1250 + 50 * (i - 14)), range(15000, 16000)]
-		for i in range(14, 96)
-	]
+	opera_versions = [list(range(14, 117)), 0, [0] + list(range(3000, 6000)), list(range(0, 100))]
 	
-	edge_versions = [
-		[i, 0, range(300 + 50 * (i - 79), 350 + 50 * (i - 79)), range(19, 183)]
-		for i in range(79, 133)
-========
-		[i, 0, range(1200 + 50 * (i - 14), 1250 + 50 * (i - 14)), range(15000, 16000)] for i in range(14, 96)
-	]
+	edge_versions = [list(range(79, 133)), 0, [0] + list(range(3000, 6000)), list(range(19, 183))]
 	
-	edge_versions = [
-		[i, 0, range(300 + 50 * (i - 79), 350 + 50 * (i - 79)), range(19, 183)] for i in range(79, 133)
->>>>>>>> dev:osn_requests/user_agents/data.py
-	]
-	
-	yandex_versions = [[i, range(1, 12), range(0, 15)] for i in range(15, 25)]
+	yandex_versions = [list(range(15, 25)), list(range(0, 12)), list(range(0, 15))]

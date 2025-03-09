@@ -26,9 +26,8 @@ osn-requests is a lightweight Python library designed to simplify common web scr
 
 ```python
 from osn_requests import find_web_element, get_req, get_html
-from osn_requests.user_agents import generate_random_user_agent
+from osn_requests.headers.user_agent import generate_random_user_agent
 from osn_requests.proxies import get_free_proxies
-
 user_agent = generate_random_user_agent()
 print(f"Using User-Agent: {user_agent}")
 
@@ -39,7 +38,7 @@ html = get_html("https://www.example.com", headers={"User-Agent": user_agent}, p
 
 title_element = find_web_element(html, "//title")
 if title_element is not None:
-    print(f"Page Title: {title_element.text}")
+  print(f"Page Title: {title_element.text}")
 
 json_data = get_req("https://api.example.com/data", headers={"User-Agent": user_agent}).json()
 print(f"JSON Data: {json_data}")

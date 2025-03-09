@@ -1,33 +1,29 @@
 import re
 import random
-<<<<<<<< HEAD:PyWebRequests/user_agents/__init__.py
-import typing
-from PyWebRequests.user_agents.data import (
-========
 from typing import (
 	Optional,
 	Sequence,
 	Union
 )
-from osn_requests.user_agents.data import (
->>>>>>>> dev:osn_requests/user_agents/__init__.py
+from osn_requests.headers.user_agent.errors import (
+	UnsupportedBrowserError,
+	UnsupportedEngineError,
+	UnsupportedOSError
+)
+from osn_requests.headers.user_agent.data import (
 	UserAgentBrowser,
 	UserAgentEngine,
 	UserAgentOS,
 	UserAgentSupportedParts
 )
-<<<<<<<< HEAD:PyWebRequests/user_agents/__init__.py
-from PyWebRequests.user_agents.data_types import (
-========
-from osn_requests.user_agents.data_types import (
->>>>>>>> dev:osn_requests/user_agents/__init__.py
+from osn_requests.headers.user_agent.data_types import (
 	supported_ua_browsers,
 	supported_ua_engines,
 	supported_ua_platforms
 )
 
 
-def create_browser_version_from_parts(parts: list[Union[int, range]], drop_last_zero: bool = False) -> str:
+def create_browser_version_from_parts(parts: list[Union[int, list[int]]], drop_last_zero: bool = False) -> str:
 	"""
 	Creates a browser version string from a list of parts.
 
@@ -36,7 +32,7 @@ def create_browser_version_from_parts(parts: list[Union[int, range]], drop_last_
 	It can optionally drop the last part if it is 0 with a certain probability.
 
 	Args:
-		parts (list[Union[int, range]]): List of parts for the version string.
+		parts (list[Union[int, list[int]]]): List of parts for the version string.
 		drop_last_zero (bool): If True, last part can be dropped if it's 0.
 
 	Returns:
@@ -62,12 +58,8 @@ def generate_yandex_ua() -> str:
 	Returns:
 		str: Yandex browser user agent string.
 	"""
-<<<<<<<< HEAD:PyWebRequests/user_agents/__init__.py
-	return f"YaBrowser/{create_browser_version_from_parts(UserAgentBrowser.yandex_versions)}"
-========
 	yandex_version = create_browser_version_from_parts(UserAgentBrowser.yandex_versions)
 	return f"YaBrowser/{yandex_version}"
->>>>>>>> dev:osn_requests/user_agents/__init__.py
 
 
 def generate_edge_ua() -> str:
@@ -77,12 +69,8 @@ def generate_edge_ua() -> str:
 	Returns:
 		str: Edge browser user agent string.
 	"""
-<<<<<<<< HEAD:PyWebRequests/user_agents/__init__.py
-	return f"Edg/{create_browser_version_from_parts(UserAgentBrowser.edge_versions)}"
-========
 	edge_version = create_browser_version_from_parts(UserAgentBrowser.edge_versions)
 	return f"Edg/{edge_version}"
->>>>>>>> dev:osn_requests/user_agents/__init__.py
 
 
 def generate_opera_ua() -> str:
@@ -92,12 +80,8 @@ def generate_opera_ua() -> str:
 	Returns:
 		str: Opera browser user agent string.
 	"""
-<<<<<<<< HEAD:PyWebRequests/user_agents/__init__.py
-	return f"Opera/{create_browser_version_from_parts(UserAgentBrowser.opera_versions)}"
-========
 	opera_version = create_browser_version_from_parts(UserAgentBrowser.opera_versions)
 	return f"Opera/{opera_version}"
->>>>>>>> dev:osn_requests/user_agents/__init__.py
 
 
 def generate_firefox_ua() -> str:
@@ -107,20 +91,11 @@ def generate_firefox_ua() -> str:
 	Returns:
 		str: Firefox browser user agent string.
 	"""
-<<<<<<<< HEAD:PyWebRequests/user_agents/__init__.py
-	return f"Firefox/{create_browser_version_from_parts(UserAgentBrowser.firefox_versions, True)}"
-========
 	firefox_version = create_browser_version_from_parts(UserAgentBrowser.firefox_versions, True)
 	return f"Firefox/{firefox_version}"
->>>>>>>> dev:osn_requests/user_agents/__init__.py
 
 
-def add_safari_version(
-		current_versions: list[str],
-		possible_versions: list[Sequence],
-		level: int,
-		previous_level_not_changed: bool
-) -> list[str]:
+def add_safari_version(current_versions: list[str], possible_versions: list[Sequence]) -> list[str]:
 	"""
 	Recursively adds or modifies Safari version parts.
 
@@ -131,35 +106,24 @@ def add_safari_version(
 	Args:
 		current_versions (list[str]): A list of current version parts.
 		possible_versions (list[Sequence]): A list of possible version parts at each level.
-		level (int): The current level in the version part hierarchy.
-		previous_level_not_changed (bool): True if the previous level was not changed, False otherwise.
 
 	Returns:
 		list[str]: Modified list of version parts.
 	"""
-	if previous_level_not_changed and len(current_versions) > level:
-		previous_version = current_versions[level]
+	previous_level_changed = False
 	
-		current_versions[level] = str(
-				int(current_versions[level]) + random.randint(0, max(possible_versions[level]) - int(current_versions[level]))
-		)
+	for i in range(len(possible_versions)):
+		if previous_level_changed:
+			current_versions[i] = str(random.choice(possible_versions[i]))
 	
-		if len(possible_versions) >= level + 1:
-			current_versions = add_safari_version(
-					current_versions,
-					possible_versions,
-					level + 1,
-					previous_version == current_versions[level]
-			)
-	else:
-		if len(current_versions) < len(possible_versions):
-			current_versions.append(str(random.choice(possible_versions[level])))
-	
-		for i in range(level + 1, len(possible_versions) - 1):
 			if random.choice([True, False]):
-				current_versions.append(str(random.choice(possible_versions[i])))
-			else:
 				break
+		else:
+			previous_version = current_versions[i]
+	
+			current_versions[i] = str(random.randint(int(current_versions[i]), max(possible_versions[i])))
+	
+			previous_level_changed = previous_version != current_versions[i]
 	
 	return current_versions
 
@@ -171,30 +135,25 @@ def generate_safari_ua(engine_ua: Optional[str] = None) -> str:
 	This function generates a Safari user agent string, optionally using an existing AppleWebKit version
 	from a given engine user agent string.
 
-<<<<<<<< HEAD:PyWebRequests/user_agents/__init__.py
-    Args:
-        engine_ua (typing.Optional[str]): An optional engine user agent string, from which to extract AppleWebKit version.
-========
 	Args:
-		engine_ua (Optional[str]): An optional engine user agent string, from which to extract AppleWebKit version.
->>>>>>>> dev:osn_requests/user_agents/__init__.py
+		engine_ua (typing.Optional[str]): An optional engine user agent string, from which to extract AppleWebKit version.
 
 	Returns:
 		str: Safari browser user agent string.
 	"""
 	if engine_ua is None or re.search(r"AppleWebKit/(\d+(?:\.\d+)*)", engine_ua) is None:
-		version_parts = [str(random.choice(UserAgentEngine.apple_webkit_versions[0]))]
+		version_parts = []
 	
-		if random.choice([True, False]):
-			version_parts.append(str(random.choice(UserAgentEngine.apple_webkit_versions[1])))
+		for i in range(len(UserAgentEngine.apple_webkit_versions)):
+			version_parts.append(str(random.choice(UserAgentEngine.apple_webkit_versions[i])))
 	
 			if random.choice([True, False]):
-				version_parts.append(str(random.choice(UserAgentEngine.apple_webkit_versions[2])))
+				break
 	
 		safari_version = ".".join(version_parts)
 	else:
 		webkit_version: list[str] = re.search(r"AppleWebKit/(\d+(?:\.\d+)*)", engine_ua).group(1).split(".")
-		webkit_version = add_safari_version(webkit_version, UserAgentBrowser.safari_versions, 0, True)
+		webkit_version = add_safari_version(webkit_version, UserAgentBrowser.safari_versions)
 	
 		safari_version = ".".join(webkit_version)
 	
@@ -208,12 +167,8 @@ def generate_chrome_ua() -> str:
 	Returns:
 		str: Chrome browser user agent string.
 	"""
-<<<<<<<< HEAD:PyWebRequests/user_agents/__init__.py
-	return f"Chrome/{create_browser_version_from_parts(UserAgentBrowser.chrome_versions)}"
-========
 	chrome_version = create_browser_version_from_parts(UserAgentBrowser.chrome_versions)
 	return f"Chrome/{chrome_version}"
->>>>>>>> dev:osn_requests/user_agents/__init__.py
 
 
 def generate_random_browser_ua(
@@ -222,31 +177,25 @@ def generate_random_browser_ua(
 		engine_ua: Optional[str] = None
 ) -> tuple[str, str]:
 	"""
-	Generates a random browser user agent string based on the given browser and engine.
+	Generates a random browser user agent string.
 
-	This function generates a user agent string for a specified browser, or a random browser if none is specified.
-	It can also generate a user agent string based on the specified engine.
+	This function creates a user agent string for a specific browser, or a randomly chosen browser if none is provided.
+	It also supports generating user agent strings based on a given engine.
 
-<<<<<<<< HEAD:PyWebRequests/user_agents/__init__.py
-    Args:
-        browser_to_generate (typing.Optional[supported_ua_browsers]): The browser for which to generate the user agent.
-        engine (typing.Optional[supported_ua_engines]): The engine on which to base the browser choice.
-        engine_ua (typing.Optional[str]): An optional engine user agent string, for Safari version generation.
-========
 	Args:
-		browser_to_generate (Optional[supported_ua_browsers]): The browser for which to generate the user agent.
-		engine (Optional[supported_ua_engines]): The engine on which to base the browser choice.
-		engine_ua (Optional[str]): An optional engine user agent string, for Safari version generation.
->>>>>>>> dev:osn_requests/user_agents/__init__.py
+		browser_to_generate (Optional[supported_ua_browsers]): The browser for which to generate the user agent. If None, a random browser will be selected.
+		engine (Optional[supported_ua_engines]): The engine to base the browser choice on.  This can influence the selection of the browser if `browser_to_generate` is None.
+		engine_ua (Optional[str]): An optional engine user agent string, specifically used for Safari version generation.
 
 	Returns:
-		tuple[str, str]: A tuple containing the generated user agent string and the browser used.
+		tuple[str, str]: A tuple containing: the generated user agent string (str), the name of the browser used to generate the user agent (str).
 
 	Raises:
-		ValueError: If the provided engine or browser is not supported.
+		UnsupportedBrowserError: If the provided browser_to_generate is not supported.
+		UnsupportedEngineError: If the provided engine is not supported.
 	"""
 	if engine is not None and engine not in UserAgentSupportedParts.engine:
-		raise ValueError(f"Unsupported engine ({engine})")
+		raise UnsupportedEngineError(engine)
 	
 	if browser_to_generate is None:
 		if engine is None:
@@ -286,7 +235,7 @@ def generate_random_browser_ua(
 	
 		return " ".join(list(filter(None, [chrome_ua, yandex_ua, safari_ua]))), browser_to_generate
 	else:
-		raise ValueError(f"Unsupported browser ({browser_to_generate})")
+		raise UnsupportedBrowserError(browser_to_generate)
 
 
 def generate_random_gecko_ua() -> str:
@@ -331,30 +280,22 @@ def generate_random_engine_ua(
 	"""
 	Generates a random engine user agent string based on the given engine and platform.
 
-<<<<<<<< HEAD:PyWebRequests/user_agents/__init__.py
-    This function generates a user agent string for a specified engine, or a random engine if none is specified.
-    It can also generate a user agent string based on the specified platform.
-
-    Args:
-        engine_to_generate (typing.Optional[supported_ua_engines]): The engine for which to generate the user agent.
-        platform (typing.Optional[supported_ua_platforms]): The platform on which to base the engine choice.
-========
 	This function generates a user agent string for a specified engine, or a random engine if none is specified.
 	It can also generate a user agent string based on the specified platform.
 
 	Args:
-		engine_to_generate (Optional[supported_ua_engines]): The engine for which to generate the user agent.
-		platform (Optional[supported_ua_platforms]): The platform on which to base the engine choice.
->>>>>>>> dev:osn_requests/user_agents/__init__.py
+		engine_to_generate (typing.Optional[supported_ua_engines]): The engine for which to generate the user agent.
+		platform (typing.Optional[supported_ua_platforms]): The platform on which to base the engine choice.
 
 	Returns:
 		tuple[str, str]: A tuple containing the generated user agent string and the engine used.
 
 	Raises:
-		ValueError: If the provided platform or engine is not supported.
+		UnsupportedEngineError: If the provided engine_to_generate is not supported.
+		UnsupportedOSError: If the provided platform is not supported.
 	"""
 	if platform is not None and platform not in UserAgentSupportedParts.os:
-		raise ValueError(f"Unsupported OS ({platform})")
+		raise UnsupportedOSError(platform)
 	
 	if engine_to_generate is None:
 		engine_to_generate = "AppleWebKit" if platform == "IOS" else random.choice(UserAgentSupportedParts.engine)
@@ -366,7 +307,7 @@ def generate_random_engine_ua(
 	elif engine_to_generate == "Blink":
 		return generate_random_apple_webkit_ua(), engine_to_generate
 	else:
-		raise ValueError(f"Unsupported engine ({engine_to_generate})")
+		raise UnsupportedEngineError(engine_to_generate)
 
 
 def generate_ios_ua() -> str:
@@ -448,19 +389,14 @@ def generate_random_os_ua(os_to_generate: Optional[supported_ua_platforms] = Non
 
 	This function generates a user agent string for a specified OS, or a random OS if none is specified.
 
-<<<<<<<< HEAD:PyWebRequests/user_agents/__init__.py
-    Args:
-        os_to_generate (typing.Optional[supported_ua_platforms]): The OS for which to generate the user agent.
-========
 	Args:
-		os_to_generate (Optional[supported_ua_platforms]): The OS for which to generate the user agent.
->>>>>>>> dev:osn_requests/user_agents/__init__.py
+		os_to_generate (typing.Optional[supported_ua_platforms]): The OS for which to generate the user agent.
 
 	Returns:
 		tuple[str, str]: A tuple containing the generated user agent string and the OS used.
 
 	Raises:
-		ValueError: If the provided OS is not supported.
+		UnsupportedOSError: If the provided os_to_generate is not supported.
 	"""
 	if os_to_generate is None:
 		os_to_generate = random.choice(UserAgentSupportedParts.os)
@@ -476,7 +412,7 @@ def generate_random_os_ua(os_to_generate: Optional[supported_ua_platforms] = Non
 	elif os_to_generate == "IOS":
 		return generate_ios_ua(), os_to_generate
 	else:
-		raise ValueError(f"Unsupported OS ({os_to_generate})")
+		raise UnsupportedOSError(os_to_generate)
 
 
 def generate_random_mozilla_ua() -> str:
@@ -489,9 +425,9 @@ def generate_random_mozilla_ua() -> str:
 	return "Mozilla/5.0"
 
 
-def generate_random_user_agent() -> str:
+def generate_random_user_agent_header() -> str:
 	"""
-	Generates a complete random user agent string.
+	Generates a complete random user agent header string.
 
 	This function combines the Mozilla, OS, Engine, and Browser user agent parts
 	to generate a complete user agent string.
@@ -505,17 +441,3 @@ def generate_random_user_agent() -> str:
 	browser_ua, used_browser = generate_random_browser_ua(engine=used_engine, engine_ua=engine_ua)
 	
 	return f"{mozilla_ua} ({os_ua}) {engine_ua} {browser_ua}"
-
-
-def create_browser_version_from_parts(parts: list[typing.Union[int, range]], drop_last_zero: bool = False) -> str:
-	browser_version = [
-		str(part)
-		if isinstance(part, int)
-		else str(random.choice(part))
-		for part in parts
-	]
-	
-	if drop_last_zero and browser_version[-1] == 0 and random.choice([True, False]):
-		browser_version.pop(-1)
-	
-	return '.'.join(browser_version)

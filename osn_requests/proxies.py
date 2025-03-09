@@ -1,6 +1,6 @@
 from typing import Optional, Union
 import osn_requests as request_functions
-from osn_requests.user_agents import generate_random_user_agent
+from osn_requests.headers.user_agent import generate_random_user_agent
 
 
 def get_free_proxies(protocol: Optional[Union[str, list[str]]] = None) -> dict[str, str]:
