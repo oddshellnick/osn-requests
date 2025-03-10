@@ -2,23 +2,10 @@ import random
 from typing import Optional
 from osn_requests.headers.accept.data import MimeTypes
 from osn_var_tools.python_instances_tools import get_class_attributes
-
-
-def get_string(mime_type: str, quality: Optional[float]) -> str:
-	"""
-	Formats a MIME type string with an optional quality value.
-
-	This function takes a MIME type and an optional quality value and formats them into a string suitable for an Accept header.
-	If a quality value is provided, it is appended to the MIME type string with the format "; q=quality".
-
-	Args:
-		mime_type (str): The MIME type string (e.g., "text/html").
-		quality (Optional[float]): An optional quality value between 0.0 and 1.0. If None, no quality value is added.
-
-	Returns:
-		str: The formatted MIME type string.
-	"""
-	return f"{mime_type}; q={quality:.1f}" if quality is not None else mime_type
+from osn_requests.headers.functions import (
+	get_quality_string,
+	sort_qualities
+)
 
 
 def generate_random_realistic_accept_header(
@@ -40,6 +27,8 @@ def generate_random_realistic_accept_header(
 	Returns:
 		str: A string representing a realistic random Accept header.
 	"""
+	mime_types = {"text/html": None}
+	
 	mime_types_list = []
 	for attribute in [
 		"application_common",
@@ -50,6 +39,8 @@ def generate_random_realistic_accept_header(
 	]:
 		mime_types_list += getattr(MimeTypes, attribute)
 	
+	mime_types_list = list(set(mime_types_list) - set(mime_types.keys()))
+	
 	if fixed_len is None:
 		min_choices = min_len
 		max_choices = len(mime_types_list) if max_len is None else min(max_len, len(mime_types_list))
@@ -58,16 +49,18 @@ def generate_random_realistic_accept_header(
 	else:
 		num_choices = min(fixed_len, len(mime_types_list))
 	
-	mime_types = {
-		choice: (random.uniform(0.7, 1.0) if random.choice([True, False]) else None)
-		for choice in random.choices(mime_types_list, k=num_choices)
-	}
-	random.shuffle(list(mime_types.items()))
+	mime_types.update(
+			{
+				choice: (random.uniform(0.7, 1.0) if random.choice([True, False]) else None)
+				for choice in random.choices(mime_types_list, k=num_choices)
+			}
+	)
+	mime_types = sort_qualities(mime_types)
 	
 	mime_types["*/*"] = 0.1
 	
 	return ", ".join(
-			get_string(mime_type, quality)
+			get_quality_string(mime_type, quality)
 			for mime_type, quality in mime_types.items()
 	)
 
@@ -111,6 +104,6 @@ def generate_random_accept_header(
 	mime_types["*/*"] = 0.1
 	
 	return ", ".join(
-			get_string(mime_type, quality)
+			get_quality_string(mime_type, quality)
 			for mime_type, quality in mime_types.items()
 	)

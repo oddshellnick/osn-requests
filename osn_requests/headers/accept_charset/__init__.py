@@ -1,23 +1,10 @@
 import random
 from typing import Optional
 from osn_requests.headers.accept_charset.data import Charsets
-
-
-def get_string(charset: str, quality: Optional[float]) -> str:
-	"""
-	Formats a charset string with an optional quality value.
-
-	This function takes a charset and an optional quality value and formats them into a string suitable for an Accept-Charset header.
-	If a quality value is provided, it is appended to the charset string with the format "; q=quality".
-
-	Args:
-		charset (str): The charset string (e.g., "utf-8").
-		quality (Optional[float]): An optional quality value between 0.0 and 1.0. If None, no quality value is added.
-
-	Returns:
-		str: The formatted charset string.
-	"""
-	return f"{charset}; q={quality:.1f}" if quality is not None else charset
+from osn_requests.headers.functions import (
+	get_quality_string,
+	sort_qualities
+)
 
 
 def generate_random_realistic_accept_charset_header(
@@ -51,16 +38,20 @@ def generate_random_realistic_accept_charset_header(
 	else:
 		num_choices = min(fixed_len, len(charsets_list))
 	
-	chosen = {
-		choice: (random.uniform(0.7, 1.0) if random.choice([True, False]) else None)
-		for choice in random.choices(charsets_list, k=num_choices)
-	}
-	random.shuffle(list(chosen.items()))
-	charsets.update(chosen)
+	charsets.update(
+			{
+				choice: (random.uniform(0.7, 1.0) if random.choice([True, False]) else None)
+				for choice in random.choices(charsets_list, k=num_choices)
+			}
+	)
+	charsets = sort_qualities(charsets)
 	
 	charsets["*"] = 0.1
 	
-	return ", ".join(get_string(charset, quality) for charset, quality in charsets.items())
+	return ", ".join(
+			get_quality_string(charset, quality)
+			for charset, quality in charsets.items()
+	)
 
 
 def generate_random_accept_charset_header(
@@ -99,4 +90,7 @@ def generate_random_accept_charset_header(
 	
 	charsets["*"] = 0.1
 	
-	return ", ".join(get_string(charset, quality) for charset, quality in charsets.items())
+	return ", ".join(
+			get_quality_string(charset, quality)
+			for charset, quality in charsets.items()
+	)
