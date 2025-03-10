@@ -1,6 +1,9 @@
 import random
-from typing import Optional
-from osn_requests.headers.types import QualityValue
+from typing import Any, Optional
+from osn_requests.headers.types import (
+	QualityValue,
+	necessary_quality_values
+)
 
 
 def sort_qualities(values: list[QualityValue]) -> list[QualityValue]:
@@ -95,3 +98,76 @@ def calculate_num_choices(
 		num_choices = min(fixed_len, list_len)
 	
 	return num_choices
+
+
+def is_quality_value(value: Any) -> bool:
+	"""
+	Checks if a given value is a valid QualityValue dictionary.
+
+	This function validates whether the input `value` conforms to the structure of a QualityValue TypedDict.
+	It checks if the value is a dictionary, if it contains all the required keys ('name', 'quality') as defined in QualityValue,
+	and if the types of the values associated with these keys match the expected types (str for 'name', Optional[float] for 'quality').
+
+	Args:
+		value (Any): The value to be checked.
+
+	Returns:
+		bool: True if the value is a valid QualityValue dictionary, False otherwise.
+	"""
+	if not isinstance(value, dict):
+		return False
+	
+	quality_value_keys = QualityValue.__annotations__
+	
+	if not (
+			all(
+					key in value.keys()
+					and isinstance(value[key], type_)
+					for key, type_ in quality_value_keys.items()
+			)
+			and len(value) == len(quality_value_keys)
+	):
+		return False
+	
+	return True
+
+
+def build_start_quality_values(values: necessary_quality_values) -> list[QualityValue]:
+	"""
+	Builds a list of QualityValue items from various input types.
+
+	This function takes an optional input `values` and converts it into a list of `QualityValue` items.
+	It supports handling `None`, a single string, a single `QualityValue` dictionary, or a list of strings or `QualityValue` dictionaries as input.
+	This ensures a consistent output format for further processing of quality values.
+
+	Args:
+		values (necessary_quality_values): The input value to be converted into a list of `QualityValue` items.
+			It can be one of the following:
+				- `None`: Returns an empty list.
+				- `str`: A single string representing the 'name' of a `QualityValue` with no specified quality. Returns a list containing a single `QualityValue` with the given name and `quality=None`.
+				- `QualityValue`: A single `QualityValue` dictionary. Returns a list containing this single `QualityValue`.
+				- `list[Union[str, QualityValue]]`: A list where each element can be either a string (name of `QualityValue`) or a `QualityValue` dictionary. Returns a list of `QualityValue` dictionaries. Strings in the list are converted to `QualityValue` with `quality=None`.
+
+	Returns:
+		list[QualityValue]: A list of `QualityValue` dictionaries.
+
+	Raises:
+		ValueError: If the provided type of `values` argument is not supported.
+	"""
+	if values is None:
+		return []
+	elif isinstance(values, str):
+		return [QualityValue(name=values, quality=None)]
+	elif is_quality_value(values):
+		return [values]
+	elif isinstance(values, list) and all(isinstance(value, str) or is_quality_value(value) for value in values):
+		return [
+			QualityValue(name=value, quality=None)
+			if isinstance(value, str)
+			else value
+			for value in values
+		]
+	else:
+		raise ValueError(
+				"Invalid value for 'values'. Must be a QualityValue or a list of QualityValue dictionaries."
+		)

@@ -1,8 +1,12 @@
 import random
 from typing import Optional
-from osn_requests.headers.types import QualityValue
 from osn_requests.headers.accept_encoding.data import Encodings
+from osn_requests.headers.types import (
+	QualityValue,
+	necessary_quality_values
+)
 from osn_requests.headers.functions import (
+	build_start_quality_values,
 	calculate_num_choices,
 	get_quality_string,
 	sort_qualities
@@ -10,6 +14,7 @@ from osn_requests.headers.functions import (
 
 
 def generate_random_realistic_accept_encoding_header(
+		necessary_encodings: necessary_quality_values = None,
 		fixed_len: Optional[int] = None,
 		max_len: Optional[int] = None,
 		min_len: int = 0
@@ -21,14 +26,17 @@ def generate_random_realistic_accept_encoding_header(
 	It selects encoding types from a predefined list and assigns them realistic quality values, prioritizing more common encodings.
 
 	Args:
-		fixed_len (Optional[int]): If provided, the header will contain exactly this many encoding types.
+		necessary_encodings (necessary_quality_values): Encodings that must be included in the header.
+		fixed_len (Optional[int]): If provided, the header will contain exactly this many encoding types (including "*").
 		max_len (Optional[int]): The maximum number of encoding types to include in the header. Used if `fixed_len` is None. Defaults to the length of the encoding list.
 		min_len (int): The minimum number of encoding types to include in the header. Used if `fixed_len` is None. Defaults to 0.
 
 	Returns:
 		str: A string representing a realistic random Accept-Encoding header.
 	"""
-	encodings_list = Encodings.all
+	encodings = build_start_quality_values(necessary_encodings)
+	
+	encodings_list = list(set(Encodings.all) - set(map(lambda a: a["name"], encodings)))
 	num_choices = calculate_num_choices(
 			list_len=len(encodings_list),
 			fixed_len=fixed_len,
@@ -36,7 +44,7 @@ def generate_random_realistic_accept_encoding_header(
 			max_len=max_len
 	)
 	
-	encodings = [
+	encodings += [
 		QualityValue(
 				name=choice,
 				quality=random.uniform(0.7, 1.0)
@@ -54,6 +62,7 @@ def generate_random_realistic_accept_encoding_header(
 
 
 def generate_random_accept_encoding_header(
+		necessary_encodings: necessary_quality_values = None,
 		fixed_len: Optional[int] = None,
 		max_len: Optional[int] = None,
 		min_len: int = 0
@@ -64,14 +73,17 @@ def generate_random_accept_encoding_header(
 	This function creates a random Accept-Encoding header string by selecting encoding types from a predefined list and assigning them random quality values.
 
 	Args:
-		fixed_len (Optional[int]): If provided, the header will contain exactly this many encoding types.
+		necessary_encodings (necessary_quality_values): Encodings that must be included in the header.
+		fixed_len (Optional[int]): If provided, the header will contain exactly this many encoding types (including "*").
 		max_len (Optional[int]): The maximum number of encoding types to include in the header. Used if `fixed_len` is None. Defaults to the length of the encoding list.
 		min_len (int): The minimum number of encoding types to include in the header. Used if `fixed_len` is None. Defaults to 0.
 
 	Returns:
 		str: A string representing a random Accept-Encoding header.
 	"""
-	encodings_list = Encodings.all
+	encodings = build_start_quality_values(necessary_encodings)
+	
+	encodings_list = list(set(Encodings.all) - set(map(lambda a: a["name"], encodings)))
 	num_choices = calculate_num_choices(
 			list_len=len(encodings_list),
 			fixed_len=fixed_len,
@@ -79,7 +91,7 @@ def generate_random_accept_encoding_header(
 			max_len=max_len
 	)
 	
-	encodings = [
+	encodings += [
 		QualityValue(
 				name=choice,
 				quality=random.uniform(0.0, 1.0)
