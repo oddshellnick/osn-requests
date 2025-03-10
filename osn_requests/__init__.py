@@ -28,7 +28,7 @@ def get_html(url: str, headers: dict | None = None, proxies: dict | None = None)
 		proxies (dict, optional): Proxies to use for the request. Defaults to None.
 
 	Returns:
-		 etree._Element:  An lxml ElementTree object representing the parsed HTML.
+		 etree._Element: An lxml ElementTree object representing the parsed HTML.
 	"""
 	return etree.HTML(
 			str(

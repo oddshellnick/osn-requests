@@ -4,6 +4,7 @@ from osn_requests.headers.types import QualityValue
 from osn_requests.headers.accept.data import MimeTypes
 from osn_var_tools.python_instances_tools import get_class_attributes
 from osn_requests.headers.functions import (
+	calculate_num_choices,
 	get_quality_string,
 	sort_qualities
 )
@@ -41,14 +42,12 @@ def generate_random_realistic_accept_header(
 		mime_types_list += getattr(MimeTypes, attribute)
 	
 	mime_types_list = list(set(mime_types_list) - set(map(lambda a: a["name"], mime_types)))
-	
-	if fixed_len is None:
-		min_choices = min_len
-		max_choices = len(mime_types_list) if max_len is None else min(max_len, len(mime_types_list))
-	
-		num_choices = random.randint(min_choices, max_choices)
-	else:
-		num_choices = min(fixed_len, len(mime_types_list))
+	num_choices = calculate_num_choices(
+			list_len=len(mime_types_list),
+			fixed_len=fixed_len,
+			min_len=min_len,
+			max_len=max_len
+	)
 	
 	mime_types += [
 		QualityValue(
@@ -57,7 +56,7 @@ def generate_random_realistic_accept_header(
 				if random.choice([True, False])
 				else None
 		)
-		for choice in random.choices(mime_types_list, k=num_choices)
+		for choice in random.sample(mime_types_list, k=num_choices)
 	]
 	
 	mime_types = sort_qualities(mime_types)
@@ -89,13 +88,12 @@ def generate_random_accept_header(
 	for attribute in get_class_attributes(MimeTypes, contains_exclude=["__", "common"]).keys():
 		mime_types_list += getattr(MimeTypes, attribute)
 	
-	if fixed_len is None:
-		min_choices = min_len
-		max_choices = len(mime_types_list) if max_len is None else min(max_len, len(mime_types_list))
-	
-		num_choices = random.randint(min_choices, max_choices)
-	else:
-		num_choices = min(fixed_len, len(mime_types_list))
+	num_choices = calculate_num_choices(
+			list_len=len(mime_types_list),
+			fixed_len=fixed_len,
+			min_len=min_len,
+			max_len=max_len
+	)
 	
 	mime_types = [
 		QualityValue(
@@ -104,7 +102,7 @@ def generate_random_accept_header(
 				if random.choice([True, False])
 				else None
 		)
-		for choice in random.choices(mime_types_list, k=num_choices)
+		for choice in random.sample(mime_types_list, k=num_choices)
 	]
 	random.shuffle(mime_types)
 	

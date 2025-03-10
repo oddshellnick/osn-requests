@@ -9,7 +9,7 @@ class QualityValue(TypedDict):
 
 	Attributes:
 	   name (str): The name of the item, such as a mime type, charset, or language code.
-	   quality (Optional[float]): An optional quality value associated with the item, ranging from 0.0 to 1.0.  A higher value indicates a higher preference. If None, it implies the highest preference.
+	   quality (Optional[float]): An optional quality value associated with the item, ranging from 0.0 to 1.0. A higher value indicates a higher preference. If None, it implies the highest preference.
 	"""
 	name: str
 	quality: Optional[float]

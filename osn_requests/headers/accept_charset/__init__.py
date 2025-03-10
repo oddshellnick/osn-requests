@@ -3,6 +3,7 @@ from typing import Optional
 from osn_requests.headers.types import QualityValue
 from osn_requests.headers.accept_charset.data import Charsets
 from osn_requests.headers.functions import (
+	calculate_num_choices,
 	get_quality_string,
 	sort_qualities
 )
@@ -22,7 +23,7 @@ def generate_random_realistic_accept_charset_header(
 	Args:
 		fixed_len (Optional[int]): If provided, the header will contain exactly this many charsets (including "utf-8" and "ascii").
 		max_len (Optional[int]): The maximum number of charsets to include in the header. Used if `fixed_len` is None. Defaults to the length of the common charset list.
-		min_len (int): The minimum number of charsets to include in the header.  Used if `fixed_len` is None. Defaults to 0.
+		min_len (int): The minimum number of charsets to include in the header. Used if `fixed_len` is None. Defaults to 0.
 
 	Returns:
 		str: A string representing a random Accept-Charset header.
@@ -33,14 +34,12 @@ def generate_random_realistic_accept_charset_header(
 	]
 	
 	charsets_list = list(set(Charsets.common) - set(map(lambda a: a["name"], charsets)))
-	
-	if fixed_len is None:
-		min_choices = min_len
-		max_choices = len(charsets_list) if max_len is None else min(max_len, len(charsets_list))
-	
-		num_choices = random.randint(min_choices, max_choices)
-	else:
-		num_choices = min(fixed_len, len(charsets_list))
+	num_choices = calculate_num_choices(
+			list_len=len(charsets_list),
+			fixed_len=fixed_len,
+			min_len=min_len,
+			max_len=max_len
+	)
 	
 	charsets += [
 		QualityValue(
@@ -49,7 +48,7 @@ def generate_random_realistic_accept_charset_header(
 				if random.choice([True, False])
 				else None
 		)
-		for choice in random.choices(charsets_list, k=num_choices)
+		for choice in random.sample(charsets_list, k=num_choices)
 	]
 	
 	charsets = sort_qualities(charsets)
@@ -78,14 +77,12 @@ def generate_random_accept_charset_header(
 		str: A string representing a random Accept-Charset header.
 	"""
 	charsets_list = Charsets.all
-	
-	if fixed_len is None:
-		min_choices = min_len
-		max_choices = len(charsets_list) if max_len is None else min(max_len, len(charsets_list))
-	
-		num_choices = random.randint(min_choices, max_choices)
-	else:
-		num_choices = min(fixed_len, len(charsets_list))
+	num_choices = calculate_num_choices(
+			list_len=len(charsets_list),
+			fixed_len=fixed_len,
+			min_len=min_len,
+			max_len=max_len
+	)
 	
 	charsets = [
 		QualityValue(
@@ -94,7 +91,7 @@ def generate_random_accept_charset_header(
 				if random.choice([True, False])
 				else None
 		)
-		for choice in random.choices(charsets_list, k=num_choices)
+		for choice in random.sample(charsets_list, k=num_choices)
 	]
 	random.shuffle(charsets)
 	

@@ -181,7 +181,7 @@ def generate_random_browser_ua(
 
 	Args:
 		browser_to_generate (Optional[supported_ua_browsers]): The browser for which to generate the user agent. If None, a random browser will be selected.
-		engine (Optional[supported_ua_engines]): The engine to base the browser choice on.  This can influence the selection of the browser if `browser_to_generate` is None.
+		engine (Optional[supported_ua_engines]): The engine to base the browser choice on. This can influence the selection of the browser if `browser_to_generate` is None.
 		engine_ua (Optional[str]): An optional engine user agent string, specifically used for Safari version generation.
 
 	Returns:
