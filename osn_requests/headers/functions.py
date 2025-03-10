@@ -1,32 +1,32 @@
 import random
-from typing import Optional
+from osn_requests.headers.types import QualityValue
 
 
-def sort_qualities(items: dict[str, Optional[float]]) -> dict[str, Optional[float]]:
+def sort_qualities(values: list[QualityValue]) -> list[QualityValue]:
 	"""
-	Sorts and shuffles a dictionary of items based on their quality values.
+	Sorts and shuffles a list of QualityValue items based on their quality values.
 
-	This function takes a dictionary of items and their associated quality values, groups the items by quality,
-	sorts these groups in descending order of quality, shuffles items within each quality group, and returns a new dictionary
-	with the items ordered by quality groups and shuffled within each group.
+	This function takes a list of QualityValue dictionaries, groups them by quality,
+	sorts these groups in descending order of quality, shuffles items within each quality group,
+	and returns a new list with the QualityValue items ordered by quality groups and shuffled within each group.
 
 	Args:
-		items (dict[str, Optional[float]]): A dictionary where keys are item strings and values are their quality scores (floats between 0.0 and 1.0, or None).
+		values (list[QualityValue]): A list of QualityValue dictionaries.
 
 	Returns:
-		dict[str, Optional[float]]: A new dictionary with the same items, sorted by quality groups in descending order and shuffled within each group.
+		list[QualityValue]: A new list of QualityValue dictionaries, sorted by quality groups in descending order and shuffled within each group.
 	"""
 	groups = {}
 	
-	for item, quality in items.items():
-		quality_str = f"{quality:.2f}" if isinstance(quality, float) else ""
+	for value in values:
+		quality_str = f"{value['quality']:.1f}" if isinstance(value["quality"], float) else ""
 	
 		if quality_str not in groups:
-			groups[quality_str] = [item]
+			groups[quality_str] = [value]
 		else:
-			groups[quality_str].append(item)
+			groups[quality_str].append(value)
 	
-	groups = dict(
+	groups: dict[str, list[QualityValue]] = dict(
 			sorted(
 					groups.items(),
 					key=lambda item_: float(item_[0])
@@ -39,27 +39,24 @@ def sort_qualities(items: dict[str, Optional[float]]) -> dict[str, Optional[floa
 	for quality_str, items_list in groups.items():
 		random.shuffle(items_list)
 	
-	return {
-		item: float(quality_str)
-		if quality_str
-		else None
+	return [
+		QualityValue(name=item["name"], quality=item["quality"])
 		for quality_str, items_list in groups.items()
 		for item in items_list
-	}
+	]
 
 
-def get_quality_string(item: str, quality: Optional[float]) -> str:
+def get_quality_string(value: QualityValue) -> str:
 	"""
-	Formats an item string with an optional quality value.
+	Formats a QualityValue item into a string representation with an optional quality value.
 
-	This function takes an item string and an optional quality value and formats them into a string suitable for headers like Accept-Language or Accept-Encoding.
-	If a quality value is provided, it is appended to the item string with the format "; q=quality".
+	This function takes a QualityValue dictionary and formats it into a string suitable for headers like Accept-Language or Accept-Encoding.
+	If a quality value is provided, it is appended to the item name with the format "; q=quality".
 
 	Args:
-		item (str): The item string (e.g., "gzip").
-		quality (Optional[float]): An optional quality value between 0.0 and 1.0. If None, no quality value is added.
+		value (QualityValue): A QualityValue dictionary.
 
 	Returns:
-		str: The formatted item string.
+		str: The formatted string representation of the QualityValue item.
 	"""
-	return f"{item}; q={quality:.1f}" if quality is not None else item
+	return f"{value['name']}; q={value['quality']:.1f}" if value["quality"] is not None else value["name"]

@@ -1,5 +1,6 @@
 import random
 from typing import Optional
+from osn_requests.headers.types import QualityValue
 from osn_requests.headers.accept_charset.data import Charsets
 from osn_requests.headers.functions import (
 	get_quality_string,
@@ -26,9 +27,12 @@ def generate_random_realistic_accept_charset_header(
 	Returns:
 		str: A string representing a random Accept-Charset header.
 	"""
-	charsets = {"utf-8": None, "ascii": None}
+	charsets = [
+		QualityValue(name="utf-8", quality=None),
+		QualityValue(name="ascii", quality=None)
+	]
 	
-	charsets_list = list(set(Charsets.common) - set(charsets.keys()))
+	charsets_list = list(set(Charsets.common) - set(map(lambda a: a["name"], charsets)))
 	
 	if fixed_len is None:
 		min_choices = min_len
@@ -38,20 +42,21 @@ def generate_random_realistic_accept_charset_header(
 	else:
 		num_choices = min(fixed_len, len(charsets_list))
 	
-	charsets.update(
-			{
-				choice: (random.uniform(0.7, 1.0) if random.choice([True, False]) else None)
-				for choice in random.choices(charsets_list, k=num_choices)
-			}
-	)
+	charsets += [
+		QualityValue(
+				name=choice,
+				quality=random.uniform(0.7, 1.0)
+				if random.choice([True, False])
+				else None
+		)
+		for choice in random.choices(charsets_list, k=num_choices)
+	]
+	
 	charsets = sort_qualities(charsets)
 	
-	charsets["*"] = 0.1
+	charsets.append(QualityValue(name="*", quality=0.1))
 	
-	return ", ".join(
-			get_quality_string(charset, quality)
-			for charset, quality in charsets.items()
-	)
+	return ", ".join(get_quality_string(charset) for charset in charsets)
 
 
 def generate_random_accept_charset_header(
@@ -82,15 +87,17 @@ def generate_random_accept_charset_header(
 	else:
 		num_choices = min(fixed_len, len(charsets_list))
 	
-	charsets = {
-		choice: (random.uniform(0.0, 1.0) if random.choice([True, False]) else None)
+	charsets = [
+		QualityValue(
+				name=choice,
+				quality=random.uniform(0.0, 1.0)
+				if random.choice([True, False])
+				else None
+		)
 		for choice in random.choices(charsets_list, k=num_choices)
-	}
-	random.shuffle(list(charsets.items()))
+	]
+	random.shuffle(charsets)
 	
-	charsets["*"] = 0.1
+	charsets.append(QualityValue(name="*", quality=0.1))
 	
-	return ", ".join(
-			get_quality_string(charset, quality)
-			for charset, quality in charsets.items()
-	)
+	return ", ".join(get_quality_string(charset) for charset in charsets)

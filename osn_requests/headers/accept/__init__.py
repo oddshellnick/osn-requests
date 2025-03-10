@@ -1,5 +1,6 @@
 import random
 from typing import Optional
+from osn_requests.headers.types import QualityValue
 from osn_requests.headers.accept.data import MimeTypes
 from osn_var_tools.python_instances_tools import get_class_attributes
 from osn_requests.headers.functions import (
@@ -27,7 +28,7 @@ def generate_random_realistic_accept_header(
 	Returns:
 		str: A string representing a realistic random Accept header.
 	"""
-	mime_types = {"text/html": None}
+	mime_types = [QualityValue(name="text/html", quality=None)]
 	
 	mime_types_list = []
 	for attribute in [
@@ -39,7 +40,7 @@ def generate_random_realistic_accept_header(
 	]:
 		mime_types_list += getattr(MimeTypes, attribute)
 	
-	mime_types_list = list(set(mime_types_list) - set(mime_types.keys()))
+	mime_types_list = list(set(mime_types_list) - set(map(lambda a: a["name"], mime_types)))
 	
 	if fixed_len is None:
 		min_choices = min_len
@@ -49,20 +50,21 @@ def generate_random_realistic_accept_header(
 	else:
 		num_choices = min(fixed_len, len(mime_types_list))
 	
-	mime_types.update(
-			{
-				choice: (random.uniform(0.7, 1.0) if random.choice([True, False]) else None)
-				for choice in random.choices(mime_types_list, k=num_choices)
-			}
-	)
+	mime_types += [
+		QualityValue(
+				name=choice,
+				quality=random.uniform(0.7, 1.0)
+				if random.choice([True, False])
+				else None
+		)
+		for choice in random.choices(mime_types_list, k=num_choices)
+	]
+	
 	mime_types = sort_qualities(mime_types)
 	
-	mime_types["*/*"] = 0.1
+	mime_types.append(QualityValue(name="*/*", quality=0.1))
 	
-	return ", ".join(
-			get_quality_string(mime_type, quality)
-			for mime_type, quality in mime_types.items()
-	)
+	return ", ".join(get_quality_string(mime_type) for mime_type in mime_types)
 
 
 def generate_random_accept_header(
@@ -95,15 +97,17 @@ def generate_random_accept_header(
 	else:
 		num_choices = min(fixed_len, len(mime_types_list))
 	
-	mime_types = {
-		choice: (random.uniform(0.0, 1.0) if random.choice([True, False]) else None)
+	mime_types = [
+		QualityValue(
+				name=choice,
+				quality=random.uniform(0.0, 1.0)
+				if random.choice([True, False])
+				else None
+		)
 		for choice in random.choices(mime_types_list, k=num_choices)
-	}
-	random.shuffle(list(mime_types.items()))
+	]
+	random.shuffle(mime_types)
 	
-	mime_types["*/*"] = 0.1
+	mime_types.append(QualityValue(name="*/*", quality=0.1))
 	
-	return ", ".join(
-			get_quality_string(mime_type, quality)
-			for mime_type, quality in mime_types.items()
-	)
+	return ", ".join(get_quality_string(mime_type) for mime_type in mime_types)
