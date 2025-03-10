@@ -4,27 +4,30 @@ from dataclasses import dataclass
 @dataclass(frozen=True)
 class MimeTypes:
 	"""
-	Dataclass for storing a structured list of MIME types, grouped by categories.
+	Dataclass for storing a structured list of MIME types, grouped by categories,
+	including common browser MIME types for each category.
 
 	Attributes:
-		application (list[str]): MIME types of the 'application' category. Used for various types of
-			applications and program data, such as documents, executable files, and compressed archives.
-		audio (list[str]): MIME types of the 'audio' category. Used to denote audio files of various
-			formats, such as MP3 and Ogg, as well as streaming and non-downloadable audio formats.
-		image (list[str]): MIME types of the 'image' category. Used to denote various image formats,
-			both raster and vector.
-		message (list[str]): MIME types of the 'message' category. Used for various types of messages,
-			such as email, HTTP messages, and message delivery notifications.
-		model (list[str]): MIME types of the 'model' category. Used to denote various 3D model formats.
-		multipart (list[str]): MIME types of the 'multipart' category. Used to denote messages
-			consisting of several parts.
-		text (list[str]): MIME types of the 'text' category. Used to denote text data,
-			such as HTML, CSS, and plain text files.
-		video (list[str]): MIME types of the 'video' category. Used to denote video files of
-			various formats, such as MP4 and WebM.
-		x_pkcs (list[str]): MIME types of the 'x-pkcs' category. Relates to Public-Key Cryptography Standards (PKCS).
-		vnd (list[str]): MIME types of the 'vnd' category. Used for vendor-specific MIME types,
-			often for proprietary formats.
+		application (list[str]): Comprehensive list of MIME types of the 'application' category.
+		application_common (list[str]): Commonly used 'application' MIME types in browsers.
+		audio (list[str]): Comprehensive list of MIME types of the 'audio' category.
+		audio_common (list[str]): Commonly used 'audio' MIME types in browsers.
+		image (list[str]): Comprehensive list of MIME types of the 'image' category.
+		image_common (list[str]): Commonly used 'image' MIME types in browsers.
+		message (list[str]): Comprehensive list of MIME types of the 'message' category.
+		message_common (list[str]): Commonly used 'message' MIME types in browsers.
+		model (list[str]): Comprehensive list of MIME types of the 'model' category.
+		model_common (list[str]): Commonly used 'model' MIME types in browsers.
+		multipart (list[str]): Comprehensive list of MIME types of the 'multipart' category.
+		multipart_common (list[str]): Commonly used 'multipart' MIME types in browsers.
+		text (list[str]): Comprehensive list of MIME types of the 'text' category.
+		text_common (list[str]): Commonly used 'text' MIME types in browsers.
+		video (list[str]): Comprehensive list of MIME types of the 'video' category.
+		video_common (list[str]): Commonly used 'video' MIME types in browsers.
+		x_pkcs (list[str]): Comprehensive list of MIME types of the 'x_pkcs' category.
+		x_pkcs_common (list[str]): Commonly used 'x_pkcs' MIME types in browsers.
+		vnd (list[str]): Comprehensive list of MIME types of the 'vnd' category.
+		vnd_common (list[str]): Commonly used 'vnd' MIME types in browsers.
 	"""
 	
 	application = [
@@ -218,6 +221,13 @@ class MimeTypes:
 		"application/x-www-form-urlencoded",
 		"application/zstd",
 	]
+	application_common = [
+		"application/json",
+		"application/javascript",
+		"application/xml",
+		"application/xhtml+xml",
+		"application/pdf",
+	]
 	
 	audio = [
 		"audio/aac",
@@ -245,6 +255,7 @@ class MimeTypes:
 		"audio/3gpp",
 		"audio/3gpp2",
 	]
+	audio_common = ["audio/mpeg", "audio/ogg", "audio/webm", "audio/wav", "audio/aac",]
 	
 	image = [
 		"image/bmp",
@@ -266,6 +277,14 @@ class MimeTypes:
 		"image/ktx",
 		"image/sgi",
 	]
+	image_common = [
+		"image/jpeg",
+		"image/png",
+		"image/gif",
+		"image/webp",
+		"image/svg+xml",
+		"image/bmp",
+	]
 	
 	message = [
 		"message/disposition-notification",
@@ -275,6 +294,7 @@ class MimeTypes:
 		"message/global-headers",
 		"message/rfc822",
 	]
+	message_common = ["message/rfc822", "message/disposition-notification",]
 	
 	model = [
 		"model/3dmf",
@@ -310,6 +330,14 @@ class MimeTypes:
 		"model/x-vrml",
 		"model/x-x3d",
 	]
+	model_common = [
+		"model/gltf+json",
+		"model/gltf-binary",
+		"model/obj",
+		"model/stl",
+		"model/vrml",
+		"model/x3d+xml",
+	]
 	
 	multipart = [
 		"multipart/alternative",
@@ -326,6 +354,12 @@ class MimeTypes:
 		"multipart/alternative",
 		"multipart/form-data",
 		"multipart/related",
+	]
+	multipart_common = [
+		"multipart/form-data",
+		"multipart/mixed",
+		"multipart/related",
+		"multipart/alternative",
 	]
 	
 	text = [
@@ -430,6 +464,15 @@ class MimeTypes:
 		"text/x-vcard",
 		"text/xml",
 	]
+	text_common = [
+		"text/html",
+		"text/plain",
+		"text/css",
+		"text/javascript",
+		"text/xml",
+		"text/csv",
+		"text/vtt",
+	]
 	
 	video = [
 		"video/mpeg",
@@ -476,12 +519,14 @@ class MimeTypes:
 		"video/x-sgi-movie",
 		"video/x-smv",
 	]
+	video_common = ["video/mp4", "video/webm", "video/ogg", "video/mpeg",]
 	
 	x_pkcs = [
 		"application/x-pkcs12",
 		"application/x-pkcs7-certificates",
 		"application/x-pkcs7-certreqresp",
 	]
+	x_pkcs_common = ["application/x-pkcs12", "application/x-pkcs7-certificates",]
 	
 	vnd = [
 		"application/vnd.adobe.air-application-installer-package+zip",
@@ -580,4 +625,13 @@ class MimeTypes:
 		"video/vnd.mpegurl",
 		"video/vnd.mpegurl",
 		"video/vnd.vivo",
+	]
+	vnd_common = [
+		"application/vnd.ms-excel",
+		"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+		"application/vnd.ms-powerpoint",
+		"application/vnd.openxmlformats-officedocument.presentationml.presentation",
+		"application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+		"application/vnd.mozilla.xul+xml",
+		"application/vnd.api+json",
 	]
