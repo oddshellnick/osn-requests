@@ -1,4 +1,3 @@
 include description.txt
-include long_description.md
 include README.md
 include requirements.txt
