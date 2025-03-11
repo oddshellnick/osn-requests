@@ -27,7 +27,7 @@ def generate_random_realistic_accept_header(
 	It selects MIME types from a curated list of common types across different categories (application, audio, image, video, text) and assigns them realistic quality values.
 
 	Args:
-		necessary_mime_types (necessary_quality_values):  MIME types that must be included in the header.
+		necessary_mime_types (necessary_quality_values): MIME types that must be included in the header.
 		fixed_len (Optional[int]): If provided, the header will contain exactly this many MIME types (including "*/*").
 		max_len (Optional[int]): The maximum number of MIME types to include in the header. Used if `fixed_len` is None. Defaults to the length of the common MIME types list.
 		min_len (int): The minimum number of MIME types to include in the header. Used if `fixed_len` is None. Defaults to 0.

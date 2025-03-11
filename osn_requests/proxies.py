@@ -2,32 +2,17 @@ from osn_requests import get_req
 from typing import (
 	Callable,
 	Optional,
-	TypedDict,
 	Union
+)
+from osn_requests.types import (
+	Proxy,
+	RequestHeaders
 )
 from osn_requests.headers.user_agent import generate_random_user_agent_header
 from osn_requests.headers.accept import generate_random_realistic_accept_header
 from osn_requests.headers.accept_charset import generate_random_realistic_accept_charset_header
 from osn_requests.headers.accept_encoding import generate_random_realistic_accept_encoding_header
 from osn_requests.headers.accept_language import generate_random_realistic_accept_language_header
-
-
-class Proxy(TypedDict):
-	"""
-	Type definition for a proxy dictionary.
-
-	This TypedDict defines the structure of a proxy object, which includes the protocol, IP address, port, and country of the proxy server.
-
-	Attributes:
-	   protocol (str): The protocol used by the proxy (e.g., 'http', 'https', 'socks4', 'socks5').
-	   ip (str): The IP address of the proxy server.
-	   port (str): The port number the proxy server is listening on.
-	   country (str): The country where the proxy server is located, represented by its ISO country code.
-	"""
-	protocol: str
-	ip: str
-	port: str
-	country: str
 
 
 def get_proxy_link(proxy: Proxy) -> str:
@@ -53,7 +38,7 @@ def create_filter_function(parameters: Optional[Union[list[str], str]]) -> Calla
 	It supports filtering against a single string, a list of strings, or no filter at all (None).
 
 	Args:
-		parameters (Optional[Union[list[str], str]]):  The parameters to filter against. Can be:
+		parameters (Optional[Union[list[str], str]]): The parameters to filter against. Can be:
 			- None: Returns a function that always returns True (no filtering).
 			- str: Returns a function that checks if the input string is equal to this parameter.
 			- list[str]: Returns a function that checks if the input string is present in this list.
@@ -84,7 +69,7 @@ def get_free_proxies(
 	This function retrieves a list of free proxies from a public API. It allows filtering the proxies based on the protocol they support (e.g., 'http', 'https') and the country of origin.
 
 	Args:
-		protocol_filter (Optional[Union[str, list[str]]]):  Filters proxies by protocol. Can be a single protocol string or a list of protocol strings. If None, no protocol filtering is applied.
+		protocol_filter (Optional[Union[str, list[str]]]): Filters proxies by protocol. Can be a single protocol string or a list of protocol strings. If None, no protocol filtering is applied.
 		country_filter (Optional[Union[str, list[str]]]): Filters proxies by country. Can be a single country code (ISO) or a list of country codes. If None, no country filtering is applied.
 
 	Returns:
@@ -95,13 +80,13 @@ def get_free_proxies(
 	
 	proxies = get_req(
 			url="https://raw.githubusercontent.com/proxifly/free-proxy-list/main/proxies/all/data.json",
-			headers={
-				"Accept": generate_random_realistic_accept_header(),
-				"Accept-Encoding": generate_random_realistic_accept_encoding_header(),
-				"Accept-Charset": generate_random_realistic_accept_charset_header(),
-				"Accept-Language": generate_random_realistic_accept_language_header(),
-				"User-Agent": generate_random_user_agent_header()
-			},
+			headers=RequestHeaders(
+					Accept=generate_random_realistic_accept_header(),
+					Accept_Encoding=generate_random_realistic_accept_encoding_header(),
+					Accept_Charset=generate_random_realistic_accept_charset_header(),
+					Accept_Language=generate_random_realistic_accept_language_header(),
+					User_Agent=generate_random_user_agent_header()
+			)
 	).json()
 	
 	return [
