@@ -1,16 +1,17 @@
 import requests
 from lxml import etree
+from typing import Optional
 from bs4 import BeautifulSoup
 
 
-def get_req(url: str, headers: dict | None = None, proxies: dict | None = None) -> requests.Response:
+def get_req(url: str, headers: Optional[dict] = None, proxies: Optional[dict] = None) -> requests.Response:
 	"""
 	Retrieves content from a given URL.
 
 	Args:
 		url (str): The URL to fetch.
-		headers (dict, optional): HTTP headers to include in the request. Defaults to None.
-		proxies (dict, optional): Proxies to use for the request. Defaults to None.
+		headers (Optional[dict]): HTTP headers to include in the request. Defaults to None.
+		proxies (Optional[dict]): Proxies to use for the request. Defaults to None.
 
 	Returns:
 		requests.Response: The response object from the request.
@@ -18,14 +19,14 @@ def get_req(url: str, headers: dict | None = None, proxies: dict | None = None) 
 	return requests.get(url=url, headers=headers, proxies=proxies)
 
 
-def get_html(url: str, headers: dict | None = None, proxies: dict | None = None) -> etree._Element:
+def get_html(url: str, headers: Optional[dict] = None, proxies: Optional[dict] = None) -> etree._Element:
 	"""
 	Fetches a URL and parses the content into an lxml ElementTree object.
 
 	Args:
 		url (str): The URL to fetch.
-		headers (dict, optional): HTTP headers to include in the request. Defaults to None.
-		proxies (dict, optional): Proxies to use for the request. Defaults to None.
+		headers (Optional[dict]): HTTP headers to include in the request. Defaults to None.
+		proxies (Optional[dict]): Proxies to use for the request. Defaults to None.
 
 	Returns:
 		 etree._Element: An lxml ElementTree object representing the parsed HTML.
@@ -54,7 +55,7 @@ def find_web_elements(etree_: etree._Element, xpath: str) -> list[etree._Element
 	return etree_.xpath(xpath)
 
 
-def find_web_element(etree_: etree._Element, xpath: str) -> etree._Element | None:
+def find_web_element(etree_: etree._Element, xpath: str) -> Optional[etree._Element]:
 	"""
 	Finds the first web element matching a given XPath expression.
 
@@ -63,7 +64,7 @@ def find_web_element(etree_: etree._Element, xpath: str) -> etree._Element | Non
 		xpath (str): The XPath expression to use.
 
 	Returns:
-		etree._Element | None: The first matching lxml ElementTree object, or None if no match is found.
+		Optional[etree._Element]: The first matching lxml ElementTree object, or None if no match is found.
 	"""
 	try:
 		return find_web_elements(etree_, xpath)[0]

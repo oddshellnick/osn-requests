@@ -18,5 +18,6 @@ class QualityValue(TypedDict):
 	name: str
 	quality: Optional[float]
 
+
 necessary_quality_value = Union[str, QualityValue]
 necessary_quality_values = Optional[Union[necessary_quality_value, list[necessary_quality_value]]]
